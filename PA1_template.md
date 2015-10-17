@@ -6,7 +6,8 @@ output: html_document
 #LOAD AND PREPROCESS THE DATA
 
 Read Measured Data from csv file and convert date string to R date type
-```{r}
+
+```r
 # read Measured activity data
 actMea <- read.csv("~/R/activity.csv")
 
@@ -21,7 +22,8 @@ intervals <- unique(actMea$interval)
 #WHAT IS MEAN TOTAL NUMBER OF STEPS TAKEN PER DAY?
 
 Calculate the total number of steps taken per day and plot histogram of Measured Data
-```{r, "Figure 1 - Measured Data", fig.height=8, fig.width=10}
+
+```r
 # sum steps per day for Measured data
 perDayMea <- tapply(actMea$steps, actMea$date, FUN = sum)
 
@@ -33,20 +35,35 @@ for (i in 1:length(metaHist$mids)){
 }
 ```
 
+![plot of chunk Figure 1 - Measured Data](figure/Figure 1 - Measured Data-1.png) 
+
 Calculate and report mean/median Steps Per Day and report results
-```{r}
+
+```r
 # calculate mean and median of Steps per Day for Measured Data and report results
 menStepsMea <- mean(perDayMea, na.rm = TRUE)
 medStepsMea <- median(perDayMea, na.rm = TRUE)
 print(paste("Mean StepsPerDay  : ", toString(menStepsMea)))
+```
+
+```
+## [1] "Mean StepsPerDay  :  10766.1886792453"
+```
+
+```r
 print(paste("Median StepsPerDay: ", toString(medStepsMea)))
+```
+
+```
+## [1] "Median StepsPerDay:  10765"
 ```
 
 
 #WHAT IS THE AVERAGE DAILY ACTIVITY PATTERN?
 
 Plot daily activity pattern with plot type = "l"
-```{r, "Figure 2 - Average Daily Activity Pattern", fig.height=8, fig.width=10}
+
+```r
 # create data frame with average number of steps per interval
 df <- data.frame(interval = intervals, avgStepsIntv = numeric(length(intervals)))
 df$avgStepsIntv <- as.data.frame(tapply(actMea$steps, actMea$interval, FUN = mean, na.rm = TRUE))[,1]
@@ -65,10 +82,17 @@ text(x=maxAvgIntvl,y=5,toString(maxAvgIntvl),pos=4)
 text(x=maxAvgIntvl,y = maxAvgSteps,paste(toString(maxAvgSteps)," - Maximum", sep=""), pos=4)
 ```
 
+![plot of chunk Figure 2 - Average Daily Activity Pattern](figure/Figure 2 - Average Daily Activity Pattern-1.png) 
+
 Report which daily interval has the maximum number of steps
-```{r}
+
+```r
 # report interval with maximum number of average steps and count of missing values
 print(paste("Interval with Maximum Number of Steps:", toString(maxAvgIntvl)))
+```
+
+```
+## [1] "Interval with Maximum Number of Steps: 835"
 ```
 
 
@@ -76,10 +100,15 @@ print(paste("Interval with Maximum Number of Steps:", toString(maxAvgIntvl)))
 #IMPUTING MISSING VALUES
 
 Calculate and report the total number of missing values
-```{r}
+
+```r
 # calculate and report number of missing values
 countNA <- length(which(is.na(actMea$steps)))
 print(paste("Count of missing values:", toString(countNA)))
+```
+
+```
+## [1] "Count of missing values: 2304"
 ```
 
 
@@ -88,7 +117,8 @@ Devise a strategy for filling in all of the missing values in the dataset.
 STRATEGY: Fill in the missing data by replacing it with integer value of the average of steps for that 5 minute interval
 
 Create a dataset that is equal to the original dataset but with the missing data filled in.
-```{r}
+
+```r
 actImp <- actMea # copy measured data
 # replace NA with average steps for that 5 minute inverval
 for (i in which(is.na(actImp$steps)))
@@ -99,7 +129,8 @@ for (i in which(is.na(actImp$steps)))
 ```
 
 Make a histogram of the total number of steps taken each day
-```{r, "Figure 3 - Imputed Data", fig.height=8, fig.width=10}
+
+```r
 # plot histogram for imputed data
 StepsPerDayImp <- tapply(actImp$steps, actImp$date, FUN = sum)
 metaHist <- hist(StepsPerDayImp, main="Imputed Data - NAs replaced with Mean of 5 minute interval")
@@ -108,23 +139,49 @@ for (i in 1:length(metaHist$mids)){
 }
 ```
 
+![plot of chunk Figure 3 - Imputed Data](figure/Figure 3 - Imputed Data-1.png) 
+
 Calculate and report the mean/median total number of steps taken per day for Imputed Data.
-```{r}
+
+```r
 # report mean/median values for imputed data
 menStepsImp <- mean(StepsPerDayImp, na.rm = TRUE)
 medStepsImp <- median(StepsPerDayImp, na.rm = TRUE)
 print(paste("Mean StepsPerDay  : ", toString(mean(StepsPerDayImp, na.rm = TRUE))))
+```
+
+```
+## [1] "Mean StepsPerDay  :  10749.7704918033"
+```
+
+```r
 print(paste("Median StepsPerDay: ", toString(median(StepsPerDayImp, na.rm = TRUE))))
+```
+
+```
+## [1] "Median StepsPerDay:  10641"
 ```
 
 Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 The estimated values for the Imputed data are lower than the original estimates. 
-```{r}
+
+```r
 diffMean <- menStepsMea - menStepsImp
 diffMedn <- medStepsMea - medStepsImp
 print(paste("Difference Mean   StepsPerDay: ", toString(diffMean)))
+```
+
+```
+## [1] "Difference Mean   StepsPerDay:  16.4181874420028"
+```
+
+```r
 print(paste("Difference Median StepsPerDay: ", toString(diffMedn)))
+```
+
+```
+## [1] "Difference Median StepsPerDay:  124"
 ```
 
 
@@ -132,7 +189,8 @@ print(paste("Difference Median StepsPerDay: ", toString(diffMedn)))
 #ARE THERE DIFFERENCES IN ACTIVITY PATTERNS BETWEEN WEEKDAYS AND WEEKENDS?
 
 Create a new factor for the Imputed Data
-```{r}
+
+```r
 # add weekday/weekend factor to imputed data frame
 wkDayEnd <- weekdays(actImp$date)
 wkDayEnd[which(wkDayEnd=="Saturday" | wkDayEnd=="Sunday")] <- "weekend"
@@ -141,7 +199,8 @@ actImp <- cbind(actImp,wkDayEnd)
 ```
 
 Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)
-```{r, "Figure 4 - Weekday-Weekend Average Daily Pattern", fig.height=10, fig.width=10}
+
+```r
 # plot weekday and weekend data together
 par(mfrow=c(2,1))
 
@@ -188,6 +247,7 @@ abline(v = maxAvgIntvl, h=hValue)
 text(x=100,y=hValue,paste(toString(hValue),"- Median"),pos=3)
 text(x=maxAvgIntvl,y=5,toString(maxAvgIntvl),pos=4)
 text(x=maxAvgIntvl,y = maxAvgSteps,paste(toString(maxAvgSteps)," - Maximum", sep=""), pos=4)
-
 ```
+
+![plot of chunk Figure 4 - Weekday-Weekend Average Daily Pattern](figure/Figure 4 - Weekday-Weekend Average Daily Pattern-1.png) 
 There is a difference between the weekday and weekend patterns. On the weekend, activity rises later in the morning when compared to the weekday, and remains consistenly higher during the late morning, afternoon and evening hours.
