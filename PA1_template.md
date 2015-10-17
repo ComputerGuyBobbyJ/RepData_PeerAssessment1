@@ -27,9 +27,8 @@ Calculate the total number of steps taken per day and plot histogram of Measured
 # sum steps per day for Measured data
 perDayMea <- tapply(actMea$steps, actMea$date, FUN = sum)
 
-# plot histogram
 par(mfrow=c(1,1))
-metaHist <- hist(perDayMea, main="Measured Data - Including NAs")
+metaHist <- hist(perDayMea, main="Measured Data - Including NAs", xlab="Steps Per Day")
 for (i in 1:length(metaHist$mids)){
     text(x=metaHist$mids[i],y=metaHist$counts[i],toString(metaHist$counts[i]), pos=3)
 }
@@ -133,7 +132,8 @@ Make a histogram of the total number of steps taken each day
 ```r
 # plot histogram for imputed data
 StepsPerDayImp <- tapply(actImp$steps, actImp$date, FUN = sum)
-metaHist <- hist(StepsPerDayImp, main="Imputed Data - NAs replaced with Mean of 5 minute interval")
+mTitle = "Imputed Data - NAs replaced with Mean of 5 minute interval"
+metaHist <- hist(StepsPerDayImp, main=mTitle, xlab = "Steps Per Day ")
 for (i in 1:length(metaHist$mids)){
     text(x=metaHist$mids[i],y=metaHist$counts[i],toString(metaHist$counts[i]), pos=3)
 }
