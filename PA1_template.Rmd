@@ -17,7 +17,6 @@ intervals <- unique(actMea$interval)
 ```
 
 
-
 #WHAT IS MEAN TOTAL NUMBER OF STEPS TAKEN PER DAY?
 
 Calculate the total number of steps taken per day and plot histogram of Measured Data
@@ -71,7 +70,6 @@ print(paste("Interval with Maximum Number of Steps:", toString(maxAvgIntvl)))
 ```
 
 
-
 #IMPUTING MISSING VALUES
 
 Calculate and report the total number of missing values
@@ -84,7 +82,7 @@ print(paste("Count of missing values:", toString(countNA)))
 
 Devise a strategy for filling in all of the missing values in the dataset.
 
-STRATEGY: Fill in the missing data by replacing it with integer value of the average of steps for that 5 minute interval
+*STRATEGY: Fill in the missing data by replacing it with integer value of the average of steps for that 5 minute interval*
 
 Create a dataset that is equal to the original dataset but with the missing data filled in.
 ```{r}
@@ -119,17 +117,22 @@ print(paste("Median StepsPerDay: ", toString(median(StepsPerDayImp, na.rm = TRUE
 
 Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-The estimated values for the Imputed data are lower than the original estimates. 
+*The estimated values for the Imputed data are lower than the original estimates.*
+
+
 ```{r}
 diffMean <- menStepsMea - menStepsImp
 diffMedn <- medStepsMea - medStepsImp
-print(paste("Difference Mean   StepsPerDay: ", toString(diffMean)))
+print(paste("Difference Mean StepsPerDay  : ", toString(diffMean)))
 print(paste("Difference Median StepsPerDay: ", toString(diffMedn)))
 ```
 
 
 
 #ARE THERE DIFFERENCES IN ACTIVITY PATTERNS BETWEEN WEEKDAYS AND WEEKENDS?
+
+*There is a difference between the weekday and weekend patterns. On the weekend, activity rises later in the morning when compared to the weekday, and remains consistenly higher than weekday activity during the late morning, afternoon and evening hours.*
+
 
 Create a new factor for the Imputed Data
 ```{r}
@@ -147,17 +150,17 @@ par(mfrow=c(2,1))
 
 # Plot daily activity pattern for weekdays
 subImp <- subset(actImp, actImp$wkDayEnd == "weekday")
-df <- data.frame(interval = intervals, avgStepsIntv = numeric(length(intervals)))
-df$avgStepsIntv <- as.data.frame(tapply(subImp$steps, subImp$interval, FUN = mean, na.rm = TRUE))[,1]
+dfWkDay <- data.frame(interval = intervals, avgStepsIntv = numeric(length(intervals)))
+dfWkDay$avgStepsIntv <- as.data.frame(tapply(subImp$steps, subImp$interval, FUN = mean, na.rm = TRUE))[,1]
 
-hValue <- round(median(df$avgStepsIntv),2)
+hValue <- round(median(dfWkDay$avgStepsIntv),2)
 
 # determine interval with maximum average steps and maximum average steps value
-maxAvgIntvl <- intervals[as.numeric(which.max(df$avgStepsIntv))]
-maxAvgSteps     <- round(max(df$avgStepsIntv),2)
+maxAvgIntvl <- intervals[as.numeric(which.max(dfWkDay$avgStepsIntv))]
+maxAvgSteps <- round(max(dfWkDay$avgStepsIntv),2)
 
 mTitle = "Week Days"
-plot(intervals,df$avgStepsIntv, type = "l", main=mTitle, ylim=c(0,250), xlab = "Interval", ylab = "Average Steps", xaxt = "n")
+plot(intervals,dfWkDay$avgStepsIntv, type = "l", main=mTitle, ylim=c(0,250), xlab = "Interval", ylab = "Average Steps", xaxt = "n")
 axis(1,seq(min(intervals),max(intervals),100))
 # add vertical line marking maximum interval
 # add horizontal line marking median value
@@ -167,19 +170,19 @@ text(x=100,y=hValue,paste(toString(hValue),"- Median"),pos=3)
 text(x=maxAvgIntvl,y=5,toString(maxAvgIntvl),pos=4)
 text(x=maxAvgIntvl,y = maxAvgSteps,paste(toString(maxAvgSteps)," - Maximum", sep=""), pos=4)
 
-# Plot daily activity pattern for weekends
+# Plot daily activity pattern for weekdays
 subImp <- subset(actImp, actImp$wkDayEnd == "weekend")
-df <- data.frame(interval = intervals, avgStepsIntv = numeric(length(intervals)))
-df$avgStepsIntv <- as.data.frame(tapply(subImp$steps, subImp$interval, FUN = mean, na.rm = TRUE))[,1]
+dfWkEnd <- data.frame(interval = intervals, avgStepsIntv = numeric(length(intervals)))
+dfWkEnd$avgStepsIntv <- as.data.frame(tapply(subImp$steps, subImp$interval, FUN = mean, na.rm = TRUE))[,1]
 
 hValue <- round(median(df$avgStepsIntv),2)
 
 # determine interval with maximum average steps and maximum average steps value
-maxAvgIntvl <- intervals[as.numeric(which.max(df$avgStepsIntv))]
-maxAvgSteps <- round(max(df$avgStepsIntv),2)
+maxAvgIntvl <- intervals[as.numeric(which.max(dfWkEnd$avgStepsIntv))]
+maxAvgSteps <- round(max(dfWkEnd$avgStepsIntv),2)
 
 mTitle = "Week Ends"
-plot(intervals,df$avgStepsIntv, type = "l", main=mTitle, ylim=c(0,250), xlab = "Interval", ylab = "Average Steps", xaxt = "n")
+plot(intervals,dfWkEnd$avgStepsIntv, type = "l", main=mTitle, ylim=c(0,250), xlab = "Interval", ylab = "Average Steps", xaxt = "n")
 axis(1,seq(min(intervals),max(intervals),100))
 # add vertical line marking maximum interval
 # add horizontal line marking median value
@@ -190,4 +193,13 @@ text(x=maxAvgIntvl,y=5,toString(maxAvgIntvl),pos=4)
 text(x=maxAvgIntvl,y = maxAvgSteps,paste(toString(maxAvgSteps)," - Maximum", sep=""), pos=4)
 
 ```
-There is a difference between the weekday and weekend patterns. On the weekend, activity rises later in the morning when compared to the weekday, and remains consistenly higher during the late morning, afternoon and evening hours.
+
+
+```{r, "Figure 5 - Difference in WeekEnds and WeekDays Patterns", fig.height=10, fig.width=10}
+par(mfrow=c(1,1))
+diffSteps <- dfWkEnd$avgStepsIntv - dfWkDay$avgStepsIntv
+mTitle = "Difference in Patterns (WeekEnds Average Steps Minus WeekDays Average Steps)"
+plot(intervals, diffSteps, type = "l", main=mTitle, xlab = "Interval", ylab = "Average Steps", xaxt = "n")
+axis(1,seq(min(intervals),max(intervals),100))
+abline(h=0)
+```
